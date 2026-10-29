@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carlos Henrique Palha | Product Designer & Full-Stack Developer</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyberBg: '#090a0f',
+            cyberCard: '#11131f',
+            cyberCardLight: '#1a1d2e',
+            cyberPurple: '#a855f7',
+            cyberCyan: '#06b6d4',
+            cyberBorder: 'rgba(168, 85, 247, 0.2)'
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts e Ícones Lucide -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Importação do arquivo de configuração seguro (ignorado pelo Git) -->
+  <script src="./config.js"></script>
+
+  <style>
+    body {
+      background-color: #090a0f;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+
+    /* TELA DE INTRODUÇÃO DO VÍDEO */
+    #intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #intro-overlay video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    /* CAMADA DE CACOS DE VIDRO */
+    #shatter-container {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      pointer-events: none;
+      display: none;
+      overflow: hidden;
+    }
+
+    .glass-shard {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+    }
+
+    @keyframes fallAndScatter {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) rotate(var(--trot)) scale(0.4);
+      }
+    }
+
+    /* Container de Revelação da Lupa */
+    .hero-reveal-container {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Imagem oculta do quarto revelada pela lupa */
+    #revealed-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      background: radial-gradient(circle 65px at var(--mouse-x, -500px) var(--mouse-y, -500px), 
+        transparent 0%, 
+        transparent 100%),
+        url('./fundo_lupa/quarto.jpg') center/cover no-repeat;
+      
+      -webkit-mask-image: radial-gradient(circle 65px at var(--mouse-x, -500px) var(--mouse-y, -500px), black 99%, transparent 100%);
+      mask-image: radial-gradient(circle 65px at var(--mouse-x, -500px) var(--mouse-y, -500px), black 99%, transparent 100%);
+      opacity: 0.95;
+      mix-blend-mode: screen;
+      filter: contrast(130%) brightness(110%);
+      transition: opacity 0.3s ease;
+    }
+
+    /* Canvas Interativo em Tela Cheia */
+    #cyber-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .bg-grid {
+      background-size: 30px 30px;
+      background-image: 
+        linear-gradient(to right, rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+    }
+
+    /* ESTILOS PARA ANIMAÇÃO NO SCROLL (SCROLL REVEAL) */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      will-change: opacity, transform;
+    }
+
+    .reveal-on-scroll.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* EFEITO DE OCULTAR INFOS NA GALERIA QUANDO PASSA O MOUSE */
+    .gallery-info-bar {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .group:hover .gallery-info-bar {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-cyberBg text-slate-100 font-sans antialiased selection:bg-cyberPurple selection:text-white">
+
+  <!-- OVERLAY DO VÍDEO INICIAL DE 10 SEGUNDOS -->
+  <div id="intro-overlay">
+    <video id="intro-video" src="./cena_guerra_soldado_espiga.mp4" autoplay muted playsinline></video>
+  </div>
+
+  <!-- CONTAINER DOS CACOS DE VIDRO -->
+  <div id="shatter-container"></div>
+
+  <!-- Canvas de Partículas, Escamas e Sprites -->
+  <canvas id="cyber-canvas"></canvas>
+
+  <!-- NAVEGAÇÃO -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-cyberBg/80 backdrop-blur-md border-b border-cyberBorder">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <a href="#" class="text-xl font-black tracking-wider text-white">
+        CARLOS<span class="text-cyberPurple">.PALHA</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
+        <a href="#sobre" class="hover:text-cyberPurple transition-colors">Sobre</a>
+        <a href="#trajetoria" class="hover:text-cyberPurple transition-colors">Trajetória</a>
+        <a href="#galeria" class="hover:text-cyberPurple transition-colors">Galeria</a>
+        <a href="#contato" class="hover:text-cyberPurple transition-colors">Contato</a>
+      </nav>
+
+      <div class="flex items-center gap-4">
+        <!-- SELETOR DE PERSONAGEM NO CABEÇALHO -->
+        <div class="flex items-center gap-2 bg-cyberCard border border-cyberBorder rounded-xl px-3 py-1.5">
+          <span class="text-xs text-slate-400 font-medium">Personagem:</span>
+          <select id="char-selector" class="bg-transparent text-xs font-bold text-cyberCyan outline-none cursor-pointer">
+            <option value="soldado" class="bg-cyberCard text-white" selected>Espiga de Milho</option>
+            <option value="luffy" class="bg-cyberCard text-white">Luffy</option>
+          </select>
+        </div>
+
+        <a href="https://github.com/carloshenriquepalhasantos-hash" target="_blank" class="p-2 rounded-xl bg-cyberCard border border-cyberBorder text-slate-300 hover:text-white hover:border-cyberPurple transition-all" title="GitHub">
+          <i data-lucide="github" class="w-5 h-5"></i>
+        </a>
+        <a href="https://www.instagram.com/carloshenriquepalha/" target="_blank" class="p-2 rounded-xl bg-cyberCard border border-cyberBorder text-slate-300 hover:text-white hover:border-cyberPurple transition-all" title="Instagram">
+          <i data-lucide="instagram" class="w-5 h-5"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION COM LUPA E EFEITO REVELADOR DO QUARTO -->
+  <section class="hero-reveal-container pt-40 pb-20 bg-grid min-h-screen flex items-center relative">
+    
+    <!-- Imagem do quarto revelada pela lupa -->
+    <div id="revealed-layer"></div>
+
+    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-20">
+      
+      <div class="lg:col-span-7 space-y-6 reveal-on-scroll">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyberPurple/10 border border-cyberBorder text-cyberPurple text-xs font-bold uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-cyberCyan animate-pulse"></span>
+          Product Designer & Full-Stack Developer
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl font-black text-white leading-tight">
+          Transformando ideias brutas em <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">experiências digitais</span>.
+        </h1>
+
+        <p class="text-slate-400 text-lg max-w-2xl">
+          Desenvolvedor Full-Stack, Product Designer e Ilustrador com sólida experiência em design gráfico, automação de sistemas, IA e cibersegurança.
+        </p>
+
+        <div class="flex flex-wrap gap-4 pt-4">
+          <a href="#trajetoria" class="px-8 py-4 rounded-xl bg-cyberPurple text-white font-bold hover:bg-purple-600 transition-all shadow-lg shadow-cyberPurple/25">
+            Ver Linha do Tempo
+          </a>
+          <a href="#contato" class="px-8 py-4 rounded-xl bg-cyberCard border border-cyberBorder text-slate-200 font-bold hover:border-cyberPurple transition-all">
+            Contato
+          </a>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 flex justify-center reveal-on-scroll">
+        <div class="relative w-72 h-72 sm:w-80 sm:h-80 rounded-3xl bg-cyberCard border border-cyberBorder p-4 shadow-2xl">
+          <div class="w-full h-full rounded-2xl bg-gradient-to-br from-cyberPurple/20 to-cyberCyan/20 flex flex-col items-center justify-center p-6 text-center space-y-4">
+            
+            <!-- FOTO DE PERFIL NA LOGO -->
+            <div class="w-20 h-20 rounded-full border-2 border-cyberPurple overflow-hidden shadow-lg shadow-cyberPurple/30 bg-cyberBg">
+              <img src="./eu/carlos_perfil.png" alt="Carlos Henrique Palha" class="w-full h-full object-cover">
+            </div>
+
+            <div>
+              <h3 class="text-lg font-bold text-white">Carlos Henrique Palha</h3>
+              <p class="text-xs text-cyberCyan">Chapecó - SC, Brasil[cite: 1]</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-1.5">
+              <span class="px-2 py-0.5 rounded-full bg-cyberBg border border-cyberBorder text-[10px] text-slate-300">Flutter</span>
+              <span class="px-2 py-0.5 rounded-full bg-cyberBg border border-cyberBorder text-[10px] text-slate-300">Python</span>
+              <span class="px-2 py-0.5 rounded-full bg-cyberBg border border-cyberBorder text-[10px] text-slate-300">Design Gráfico</span>
+              <span class="px-2 py-0.5 rounded-full bg-cyberBg border border-cyberBorder text-[10px] text-slate-300">Automações</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SEÇÃO SOBRE MIM & STACK -->
+  <section id="sobre" class="py-24 bg-cyberCard/30 border-t border-cyberBorder relative z-20">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="max-w-3xl space-y-6 reveal-on-scroll">
+        <h2 class="text-3xl font-black text-white">Sobre Mim</h2>
+        <p class="text-slate-300 text-base leading-relaxed">
+          Atuo como Desenvolvedor Mobile & Web, Product Designer e Artista em Chapecó - SC[cite: 1]. Crio ecossistemas de software robustos focados em soluções escaláveis utilizando Flutter, Python, Firebase e SQLite, além de implementação de fluxos de automação com IA e arquiteturas de cibersegurança de alto porte.
+        </p>
+        <p class="text-slate-400 text-base leading-relaxed">
+          Minha abordagem unifica o rigor técnico do código limpo, conteinerização e bancos de dados eficientes à sensibilidade estética da ilustração digital, interfaces Dark Mode e design de produtos.
+        </p>
+      </div>
+
+      <!-- GRID COMPLETO DE TECNOLOGIAS E ESPECIALIDADES -->
+      <div id="stack" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
+        <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 reveal-on-scroll">
+          <div class="w-10 h-10 rounded-xl bg-cyberPurple/20 border border-cyberPurple flex items-center justify-center text-cyberPurple">
+            <i data-lucide="smartphone" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-bold text-white text-base">Mobile & Frontend</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Desenvolvimento multiplataforma escalável com Flutter, Dart, React, TypeScript, Next.js, Tailwind CSS e HTML5 com foco em interfaces imersivas em Dark Mode.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 reveal-on-scroll">
+          <div class="w-10 h-10 rounded-xl bg-cyberCyan/20 border border-cyberCyan flex items-center justify-center text-cyberCyan">
+            <i data-lucide="server" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-bold text-white text-base">Backend & Dados</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Sistemas robustos construídos com Python, FastAPI, Node.js, Docker, n8n, WAHA (Automações de WhatsApp), Redis, PostgreSQL, Firebase e SQLite.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 reveal-on-scroll">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500 flex items-center justify-center text-purple-400">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-bold text-white text-base">IA & Cibersegurança</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Implementação de inteligência artificial aplicada, automação inteligente de processos, proteção de dados e diretrizes de cibersegurança de alto porte.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEÇÃO: LINHA DO TEMPO / EXPERIÊNCIA PROFISSIONAL (CYBERPUNK) -->
+  <section id="trajetoria" class="py-24 bg-cyberBg border-t border-cyberBorder relative z-20">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto space-y-4 mb-16 reveal-on-scroll">
+        <h2 class="text-3xl sm:text-4xl font-black text-white">Linha do Tempo & <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Experiência</span></h2>
+        <p class="text-slate-400 text-sm">A evolução prática da minha jornada técnica, criativa e profissional.</p>
+      </div>
+
+      <div class="max-w-4xl mx-auto relative border-l-2 border-cyberPurple/30 pl-6 sm:pl-10 space-y-12">
+        
+        <!-- ITEM 1 -->
+        <div class="relative group reveal-on-scroll">
+          <div class="absolute -left-[31px] sm:-left-[47px] top-1 w-5 h-5 rounded-full bg-cyberBg border-2 border-cyberPurple flex items-center justify-center shadow-lg shadow-cyberPurple/50">
+            <div class="w-2 h-2 rounded-full bg-cyberCyan animate-pulse"></div>
+          </div>
+          <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-cyberPurple transition-all">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold px-3 py-1 rounded-full bg-cyberPurple/10 text-cyberPurple border border-cyberBorder">Foco Atual</span>
+              <span class="text-xs text-slate-400">Desenvolvimento & IA</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Product Designer & Full-Stack Developer</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Criação e engenharia de soluções digitais avançadas. Desenvolvimento mobile com Flutter, back-ends em Python/FastAPI, conteinerização com Docker e fluxos integrados de Inteligência Artificial e automações locais.
+            </p>
+          </div>
+        </div>
+
+        <!-- ITEM 2 -->
+        <div class="relative group reveal-on-scroll">
+          <div class="absolute -left-[31px] sm:-left-[47px] top-1 w-5 h-5 rounded-full bg-cyberBg border-2 border-cyberCyan flex items-center justify-center">
+            <div class="w-2 h-2 rounded-full bg-cyberPurple"></div>
+          </div>
+          <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-cyberCyan transition-all">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold px-3 py-1 rounded-full bg-cyberCyan/10 text-cyberCyan border border-cyberBorder">Trajetória Visual</span>
+              <span class="text-xs text-slate-400">Artes & Identidade</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Ilustrador & 3 Anos em Design Gráfico</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Experiência sólida na criação de identidades visuais, branding, ilustrações digitais e conceitos artísticos (como paisagens urbanas e artes estéticas inspiradas na cultura pop e streetwear).
+            </p>
+          </div>
+        </div>
+
+        <!-- ITEM 3 -->
+        <div class="relative group reveal-on-scroll">
+          <div class="absolute -left-[31px] sm:-left-[47px] top-1 w-5 h-5 rounded-full bg-cyberBg border-2 border-purple-500 flex items-center justify-center">
+            <div class="w-2 h-2 rounded-full bg-purple-400"></div>
+          </div>
+          <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-purple-500 transition-all">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-cyberBorder">Background Versátil</span>
+              <span class="text-xs text-slate-400">Hardware & Automação</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">Eletrônica, Manutenção & Automações Industriais</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Bagagem técnica abrangente que vai desde a manutenção de hardware e eletrônica até automações industriais, unindo sistemas físicos e lógicos com precisão operacional.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SEÇÃO: GALERIA DE ILUSTRAÇÕES & ARTE DIGITAL (BEHANCE) -->
+  <section id="galeria" class="py-24 bg-cyberCard/30 border-t border-cyberBorder relative z-25">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto space-y-4 mb-16 reveal-on-scroll">
+        <h2 class="text-3xl sm:text-4xl font-black text-white">Galeria de <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Ilustrações</span></h2>
+        <p class="text-slate-400 text-sm">Explorando conceitos artísticos e direções visuais criativas. Clique na imagem para expandir em tela cheia[cite: 5].</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- ARTE 1 -->
+        <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item" data-src="./artes_behance/luff.png" data-title="Luffy Concept" data-desc="Ilustração Digital / Fanart">
+          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+            <img src="./artes_behance/luff.png" alt="Luffy Artwork" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
+            <div>
+              <h4 class="font-bold text-white text-sm">Luffy Concept</h4>
+              <p class="text-[11px] text-cyberCyan">Ilustração Digital / Fanart</p>
+            </div>
+            <span class="px-2 py-1 rounded bg-cyberBg border border-cyberBorder text-[10px] text-slate-400">Expandir</span>
+          </div>
+        </div>
+
+        <!-- ARTE 2 -->
+        <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item" data-src="./artes_behance/zoro.png" data-title="Zoro Artwork" data-desc="Ilustração / Personagem">
+          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+            <img src="./artes_behance/zoro.png" alt="Zoro Artwork" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
+            <div>
+              <h4 class="font-bold text-white text-sm">Zoro Artwork</h4>
+              <p class="text-[11px] text-cyberCyan">Ilustração / Personagem</p>
+            </div>
+            <span class="px-2 py-1 rounded bg-cyberBg border border-cyberBorder text-[10px] text-slate-400">Expandir</span>
+          </div>
+        </div>
+
+        <!-- ARTE 3 -->
+        <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item" data-src="./artes_behance/fin kake.png" data-title="Fin Kake Style" data-desc="Conceito Artístico">
+          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+            <img src="./artes_behance/fin kake.png" alt="Fin Kake Artwork" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
+            <div>
+              <h4 class="font-bold text-white text-sm">Fin Kake Style</h4>
+              <p class="text-[11px] text-cyberCyan">Conceito Artístico</p>
+            </div>
+            <span class="px-2 py-1 rounded bg-cyberBg border border-cyberBorder text-[10px] text-slate-400">Expandir</span>
+          </div>
+        </div>
+
+        <!-- ARTE 4 -->
+        <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item" data-src="./artes_behance/arvore.png" data-title="Estudo Paisagem 01" data-desc="Cenário Impressionista">
+          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+            <img src="./artes_behance/arvore.png" alt="Paisagem Árvore" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
+            <div>
+              <h4 class="font-bold text-white text-sm">Estudo Paisagem 01</h4>
+              <p class="text-[11px] text-cyberCyan">Cenário Impressionista</p>
+            </div>
+            <span class="px-2 py-1 rounded bg-cyberBg border border-cyberBorder text-[10px] text-slate-400">Expandir</span>
+          </div>
+        </div>
+
+        <!-- ARTE 5 -->
+        <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item sm:col-span-2 lg:col-span-2" data-src="./artes_behance/arvore 2.png" data-title="Estudo Paisagem 02 (Van Gogh Style)" data-desc="Texturas e Atmosfera Visual">
+          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+            <img src="./artes_behance/arvore 2.png" alt="Paisagem Árvore 2" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
+            <div>
+              <h4 class="font-bold text-white text-sm">Estudo Paisagem 02 (Van Gogh Style)</h4>
+              <p class="text-[11px] text-cyberCyan">Texturas e Atmosfera Visual</p>
+            </div>
+            <span class="px-2 py-1 rounded bg-cyberBg border border-cyberBorder text-[10px] text-slate-400">Expandir</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL / TELA CHEIA DA FOTO (LIGHTBOX) -->
+  <div id="image-modal" class="fixed inset-0 z-[100001] bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+    <button id="modal-close-btn" class="absolute top-6 right-6 p-3 rounded-full bg-cyberCard border border-cyberBorder text-white hover:border-cyberPurple transition-all z-[100002]">
+      <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+    
+    <div class="relative max-w-5xl w-full flex flex-col items-center">
+      <img id="modal-img" src="" alt="" class="max-h-[80vh] w-auto object-contain rounded-2xl border border-cyberBorder shadow-2xl">
+      <div class="mt-4 text-center">
+        <h3 id="modal-title" class="text-xl font-bold text-white"></h3>
+        <p id="modal-desc" class="text-xs text-cyberCyan mt-1"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEÇÃO DE CONTATO COM API SEGURA -->
+  <section id="contato" class="py-24 bg-cyberBg border-t border-cyberBorder relative z-20">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center max-w-2xl mx-auto space-y-4 mb-16 reveal-on-scroll">
+        <h2 class="text-3xl sm:text-4xl font-black text-white">Vamos <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Conversar</span>?</h2>
+        <p class="text-slate-400 text-sm">Entre em contato direto pelos canais abaixo ou envie uma mensagem diretamente pelo formulário integrado.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-5xl mx-auto">
+        
+        <!-- CARDS DE CONTATO DIRETO -->
+        <div class="lg:col-span-5 space-y-4 reveal-on-scroll">
+          <a href="mailto:carloshenriquepalhasantos@gmail.com" class="flex items-center gap-4 p-5 rounded-2xl bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-cyberPurple/20 border border-cyberPurple flex items-center justify-center text-cyberPurple group-hover:scale-110 transition-transform">
+              <i data-lucide="mail" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 block font-medium">E-mail Profissional</span>
+              <span class="text-sm font-bold text-white break-all">carloshenriquepalhasantos@gmail.com</span>
+            </div>
+          </a>
+
+          <a href="https://wa.me/5549991710357" target="_blank" class="flex items-center gap-4 p-5 rounded-2xl bg-cyberCard border border-cyberBorder hover:border-cyberCyan transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-cyberCyan/20 border border-cyberCyan flex items-center justify-center text-cyberCyan group-hover:scale-110 transition-transform">
+              <i data-lucide="message-square" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 block font-medium">WhatsApp Business</span>
+              <span class="text-sm font-bold text-white">(49) 99171-0357</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- FORMULÁRIO COM CARREGAMENTO DINÂMICO DA CHAVE -->
+        <div class="lg:col-span-7 p-8 rounded-3xl bg-cyberCard border border-cyberBorder space-y-6 reveal-on-scroll">
+          <form action="https://api.web3forms.com/submit" method="POST" class="space-y-4" id="contact-form">
+            <!-- A chave é injetada via config.js mantendo o código limpo para o GitHub -->
+            <input type="hidden" name="access_key" id="form-access-key" value="">
+            <input type="hidden" name="subject" value="Nova mensagem recebida pelo Portfólio Cyberpunk!">
+            
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-2">Seu Nome</label>
+              <input type="text" name="name" placeholder="Como gostaria de ser chamado?" required class="w-full px-4 py-3 rounded-xl bg-cyberBg border border-cyberBorder text-white text-sm focus:outline-none focus:border-cyberPurple transition-colors">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-2">Seu E-mail (Para retorno)</label>
+              <input type="email" name="email" placeholder="seu@email.com" required class="w-full px-4 py-3 rounded-xl bg-cyberBg border border-cyberBorder text-white text-sm focus:outline-none focus:border-cyberPurple transition-colors">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-2">Mensagem</label>
+              <textarea name="message" rows="4" placeholder="Escreva sua mensagem ou proposta de projeto..." required class="w-full px-4 py-3 rounded-xl bg-cyberBg border border-cyberBorder text-white text-sm focus:outline-none focus:border-cyberPurple transition-colors resize-none"></textarea>
+            </div>
+            <button type="submit" id="submit-btn" class="w-full py-4 rounded-xl bg-cyberPurple text-white font-bold hover:bg-purple-600 transition-all shadow-lg shadow-cyberPurple/25">
+              Enviar Mensagem
+            </button>
+            <p id="form-status" class="text-xs text-center text-cyberCyan hidden pt-2"></p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- RODAPÉ -->
+  <footer class="py-12 border-t border-cyberBorder bg-cyberCard/50 relative z-20">
+    <div class="max-w-7xl mx-auto px-6 text-center text-slate-500 text-sm">
+      <p>© 2026 Carlos Henrique Palha Santos. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT DE CONTROLE -->
+  <script>
+    lucide.createIcons();
+
+    // Injeta a chave do config.js de forma segura ao carregar a página
+    if (typeof CONFIG !== 'undefined' && CONFIG.WEB3FORMS_KEY) {
+      document.getElementById('form-access-key').value = CONFIG.WEB3FORMS_KEY;
+    }
+
+    const introOverlay = document.getElementById('intro-overlay');
+    const introVideo = document.getElementById('intro-video');
+    const shatterContainer = document.getElementById('shatter-container');
+    const charSelector = document.getElementById('char-selector');
+
+    let introActive = true; 
+
+    introVideo.play().catch(e => {
+      introVideo.muted = true;
+      introVideo.play();
+    });
+
+    introVideo.addEventListener('pause', () => {
+      if (introActive) introVideo.play();
+    });
+
+    function triggerGlassShatter() {
+      if (!introActive) return;
+      introActive = false; 
+
+      introOverlay.style.display = 'none';
+      shatterContainer.style.display = 'block';
+
+      const cols = 12;
+      const rows = 8;
+      const width = window.innerWidth / cols;
+      const height = window.innerHeight / rows;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const shard = document.createElement('div');
+          shard.classList.add('glass-shard');
+
+          shard.style.width = `${width + 2}px`;
+          shard.style.height = `${height + 2}px`;
+          shard.style.left = `${c * width}px`;
+          shard.style.top = `${r * height}px`;
+
+          const tx = (Math.random() - 0.5) * 800;
+          const ty = Math.random() * 700 + 500;
+          const trot = (Math.random() - 0.5) * 360;
+          
+          const duration = Math.random() * 1.5 + 1.5;
+
+          shard.style.setProperty('--tx', `${tx}px`);
+          shard.style.setProperty('--ty', `${ty}px`);
+          shard.style.setProperty('--trot', `${trot}deg`);
+          shard.style.animation = `fallAndScatter ${duration}s cubic-bezier(0.25, 1, 0.5, 1) forwards`;
+
+          shatterContainer.appendChild(shard);
+        }
+      }
+
+      setTimeout(() => {
+        shatterContainer.remove();
+        updateCursorStyle(); 
+        initScrollReveal(); 
+      }, 3200);
+    }
+
+    introVideo.addEventListener('ended', triggerGlassShatter);
+    setTimeout(() => {
+      if (introActive) triggerGlassShatter();
+    }, 10500);
+
+    // SISTEMA DE ANIMAÇÃO AO SCROLL (SCROLL REVEAL)
+    function initScrollReveal() {
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.15
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+    }
+
+    // SISTEMA DE MODAL PARA VISUALIZAR FOTO COMPLETA (LIGHTBOX)
+    const modal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    document.querySelectorAll('.gallery-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const src = item.getAttribute('data-src');
+        const title = item.getAttribute('data-title');
+        const desc = item.getAttribute('data-desc');
+
+        modalImg.src = src;
+        modalTitle.textContent = title;
+        modalDesc.textContent = desc;
+
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+      });
+    });
+
+    function closeModal() {
+      modal.classList.add('opacity-0');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+
+    modalCloseBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // SCRIPT DE ENVIO DO FORMULÁRIO VIA API (WEB3FORMS)
+    const form = document.getElementById('contact-form');
+    const formStatus = document.getElementById('form-status');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      formStatus.classList.remove('hidden');
+      formStatus.textContent = "Enviando mensagem...";
+
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      })
+      .then(async (response) => {
+        let json = await response.json();
+        if (response.status == 200) {
+          formStatus.textContent = "Mensagem enviada com sucesso para carloshenriquepalhasantos@gmail.com!";
+          form.reset();
+        } else {
+          formStatus.textContent = json.message || "Erro ao enviar. Tente novamente.";
+        }
+      })
+      .catch(error => {
+        formStatus.textContent = "Erro de conexão. Verifique sua internet.";
+      });
+    });
+
+    // SISTEMA DE CURSOR NATIVO DE MILHO
+    const milhoSprite = new Image();
+    milhoSprite.src = './pack_de_sprate/Sprite de Oito Ícones de Milho Direcional.png';
+
+    let customCursorUrl = '';
+
+    milhoSprite.onload = () => {
+      const cCanvas = document.createElement('canvas');
+      const cCtx = cCanvas.getContext('2d');
+      const size = 38; 
+      cCanvas.width = size;
+      cCanvas.height = size;
+
+      const fWidth = milhoSprite.width / 4;
+      const fHeight = milhoSprite.height / 2;
+
+      cCtx.drawImage(milhoSprite, 0, 0, fWidth, fHeight, 0, 0, size, size);
+      customCursorUrl = cCanvas.toDataURL('image/png');
+
+      if (!introActive) {
+        updateCursorStyle();
+      }
+    };
+
+    function updateCursorStyle() {
+      if (introActive) return;
+      if (charSelector.value === 'soldado' && customCursorUrl) {
+        document.body.style.cursor = `url(${customCursorUrl}) 19 19, auto`;
+      } else {
+        document.body.style.cursor = 'default';
+      }
+    }
+
+    charSelector.addEventListener('change', updateCursorStyle);
+
+    // SISTEMA DE CANVAS (LUPA, PARTÍCULAS E ANIMAÇÃO DO LUFFY)
+    const canvas = document.getElementById('cyber-canvas');
+    const ctx = canvas.getContext('2d');
+    const revealedLayer = document.getElementById('revealed-layer');
+
+    let mouse = { x: -500, y: -500, prevX: -500, prevY: -500, speed: 0, active: false };
+    let particles = [];
+    let strikes = []; 
+    const colors = ['#a855f7', '#06b6d4', '#3b82f6', '#ec4899'];
+    const LENS_RADIUS = 65;
+    const SCALE_COUNT = 14;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const luffySprite = new Image();
+    luffySprite.src = './pack_de_sprate/luffy-spritesheet.png';
+
+    const COLS = 4;
+    const ROWS = 2;
+    const TOTAL_FRAMES = 8;
+
+    class CharacterStrike {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.currentFrame = 0;
+        this.frameInterval = 1000 / 12; // 12 FPS
+        this.lastTime = performance.now();
+        this.finished = false;
+      }
+
+      update(now) {
+        if (now - this.lastTime > this.frameInterval) {
+          this.currentFrame++;
+          this.lastTime = now;
+          if (this.currentFrame >= TOTAL_FRAMES) {
+            this.finished = true;
+          }
+        }
+      }
+
+      draw() {
+        if (!luffySprite.complete || luffySprite.naturalWidth === 0 || this.finished) return;
+
+        const fWidth = luffySprite.width / COLS;
+        const fHeight = luffySprite.height / ROWS;
+
+        const col = this.currentFrame % COLS;
+        const row = Math.floor(this.currentFrame / COLS);
+
+        const srcX = col * fWidth;
+        const srcY = row * fHeight;
+        const renderSize = 130;
+
+        ctx.save();
+        ctx.drawImage(
+          luffySprite,
+          srcX, srcY, fWidth, fHeight,
+          this.x - renderSize / 2, this.y - renderSize / 2, renderSize, renderSize
+        );
+        ctx.restore();
+      }
+    }
+
+    window.addEventListener('click', (e) => {
+      if (introActive) return; 
+
+      const selectedChar = charSelector.value;
+
+      if (selectedChar === 'luffy') {
+        strikes.push(new CharacterStrike(e.clientX, e.clientY));
+      }
+
+      for (let i = 0; i < 18; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        particles.push(new CyberParticle(e.clientX, e.clientY, Math.cos(angle) * 3, Math.sin(angle) * 3));
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (introActive) return; 
+
+      mouse.prevX = mouse.x;
+      mouse.prevY = mouse.y;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+
+      const dx = mouse.x - mouse.prevX;
+      const dy = mouse.y - mouse.prevY;
+      mouse.speed = Math.sqrt(dx * dx + dy * dy);
+
+      const rect = revealedLayer.getBoundingClientRect();
+      const relativeX = e.clientX - rect.left;
+      const relativeY = e.clientY - rect.top;
+
+      revealedLayer.style.setProperty('--mouse-x', `${relativeX}px`);
+      revealedLayer.style.setProperty('--mouse-y', `${relativeY}px`);
+
+      if (mouse.speed > 2) {
+        const spawnAngle = Math.random() * Math.PI * 2;
+        const offset = LENS_RADIUS + (mouse.speed * 0.8);
+        const spawnX = mouse.x + Math.cos(spawnAngle) * offset;
+        const spawnY = mouse.y + Math.sin(spawnAngle) * offset;
+        
+        for (let i = 0; i < 2; i++) {
+          particles.push(new CyberParticle(spawnX, spawnY, Math.cos(spawnAngle), Math.sin(spawnAngle)));
+        }
+      }
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouse.active = false;
+    });
+
+    class CyberParticle {
+      constructor(x, y, dirX, dirY) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.floor(Math.random() * 6) + 3;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.vx = dirX * (Math.random() * 3 + 1) + (Math.random() - 0.5);
+        this.vy = dirY * (Math.random() * 3 + 1) + (Math.random() - 0.5);
+        this.alpha = 1;
+        this.decay = Math.random() * 0.03 + 0.02;
+        this.isHollow = Math.random() > 0.5;
+        this.rotation = Math.random() * Math.PI;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        
+        ctx.strokeStyle = this.color;
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 8;
+        
+        if (this.isHollow) {
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(-this.size / 2, -this.size / 2, this.size, this.size);
+        } else {
+          ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+        }
+        ctx.restore();
+      }
+    }
+
+    let globalRotation = 0;
+    let currentExtension = 0;
+
+    function animate(now) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!introActive) {
+        if (mouse.active) {
+          globalRotation += 0.02;
+          
+          const targetExtension = Math.min(mouse.speed * 1.8, 28);
+          currentExtension += (targetExtension - currentExtension) * 0.15;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(mouse.x, mouse.y, LENS_RADIUS, 0, Math.PI * 2);
+          ctx.strokeStyle = '#a855f7';
+          ctx.lineWidth = 2;
+          ctx.shadowColor = '#a855f7';
+          ctx.shadowBlur = 12;
+          ctx.stroke();
+
+          for (let i = 0; i < SCALE_COUNT; i++) {
+            const angle = (i / SCALE_COUNT) * Math.PI * 2 + globalRotation;
+            
+            const scaleRadius = LENS_RADIUS + 4 + currentExtension;
+            const scaleX = mouse.x + Math.cos(angle) * scaleRadius;
+            const scaleY = mouse.y + Math.sin(angle) * scaleRadius;
+
+            ctx.save();
+            ctx.translate(scaleX, scaleY);
+            
+            5 + (currentExtension * 0.03);
+            const tiltAngle = angle + Math.PI / 2 + (currentExtension * 0.03);
+            ctx.rotate(tiltAngle);
+
+            ctx.beginPath();
+            ctx.moveTo(-5, 0);
+            ctx.lineTo(5, -2);
+            ctx.lineTo(7, 6);
+            ctx.lineTo(-7, 6);
+            ctx.closePath();
+
+            ctx.fillStyle = i % 2 === 0 ? '#06b6d4' : '#a855f7';
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 6;
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+            ctx.restore();
+          }
+          ctx.restore();
+
+          mouse.speed *= 0.9;
+        }
+
+        for (let i = strikes.length - 1; i >= 0; i--) {
+          strikes[i].update(now);
+          strikes[i].draw();
+
+          if (strikes[i].finished) {
+            strikes.splice(i, 1);
+          }
+        }
+      }
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+
+        if (particles[i].alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
