@@ -118,6 +118,12 @@
       transition: opacity 0.3s ease;
     }
 
+    @media (max-width: 768px) {
+      #revealed-layer {
+        display: none; /* Desativa a lupa pesada em telas touch para otimizar performance mobile */
+      }
+    }
+
     /* Canvas Interativo em Tela Cheia */
     #cyber-canvas {
       position: fixed;
@@ -139,8 +145,8 @@
     /* ESTILOS PARA ANIMAÇÃO NO SCROLL (SCROLL REVEAL) */
     .reveal-on-scroll {
       opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
       will-change: opacity, transform;
     }
 
@@ -156,10 +162,12 @@
       transform: translateY(0);
     }
 
-    .group:hover .gallery-info-bar {
-      opacity: 0;
-      transform: translateY(10px);
-      pointer-events: none;
+    @media (min-width: 768px) {
+      .group:hover .gallery-info-bar {
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+      }
     }
   </style>
 </head>
@@ -176,24 +184,25 @@
   <!-- Canvas de Partículas, Escamas e Sprites -->
   <canvas id="cyber-canvas"></canvas>
 
-  <!-- NAVEGAÇÃO -->
-  <header class="fixed top-0 left-0 w-full z-50 bg-cyberBg/80 backdrop-blur-md border-b border-cyberBorder">
-    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <a href="#" class="text-xl font-black tracking-wider text-white">
+  <!-- NAVEGAÇÃO RESPONSIVA -->
+  <header class="fixed top-0 left-0 w-full z-50 bg-cyberBg/90 backdrop-blur-md border-b border-cyberBorder">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+      <a href="#" class="text-lg sm:text-xl font-black tracking-wider text-white">
         CARLOS<span class="text-cyberPurple">.PALHA</span>
       </a>
 
-      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
+      <!-- Menu Desktop -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-300">
         <a href="#sobre" class="hover:text-cyberPurple transition-colors">Sobre</a>
         <a href="#trajetoria" class="hover:text-cyberPurple transition-colors">Trajetória</a>
         <a href="#galeria" class="hover:text-cyberPurple transition-colors">Galeria</a>
         <a href="#contato" class="hover:text-cyberPurple transition-colors">Contato</a>
       </nav>
 
-      <div class="flex items-center gap-4">
-        <!-- SELETOR DE PERSONAGEM NO CABEÇALHO -->
-        <div class="flex items-center gap-2 bg-cyberCard border border-cyberBorder rounded-xl px-3 py-1.5">
-          <span class="text-xs text-slate-400 font-medium">Personagem:</span>
+      <div class="flex items-center gap-3">
+        <!-- SELETOR DE PERSONAGEM -->
+        <div class="hidden sm:flex items-center gap-2 bg-cyberCard border border-cyberBorder rounded-xl px-2.5 py-1.5">
+          <span class="text-[11px] text-slate-400 font-medium">Personagem:</span>
           <select id="char-selector" class="bg-transparent text-xs font-bold text-cyberCyan outline-none cursor-pointer">
             <option value="soldado" class="bg-cyberCard text-white" selected>Espiga de Milho</option>
             <option value="luffy" class="bg-cyberCard text-white">Luffy</option>
@@ -201,58 +210,78 @@
         </div>
 
         <a href="https://github.com/carloshenriquepalhasantos-hash" target="_blank" class="p-2 rounded-xl bg-cyberCard border border-cyberBorder text-slate-300 hover:text-white hover:border-cyberPurple transition-all" title="GitHub">
-          <i data-lucide="github" class="w-5 h-5"></i>
+          <i data-lucide="github" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </a>
         <a href="https://www.instagram.com/carloshenriquepalha/" target="_blank" class="p-2 rounded-xl bg-cyberCard border border-cyberBorder text-slate-300 hover:text-white hover:border-cyberPurple transition-all" title="Instagram">
-          <i data-lucide="instagram" class="w-5 h-5"></i>
+          <i data-lucide="instagram" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </a>
+
+        <!-- Botão Menu Mobile Hamburguer -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 rounded-xl bg-cyberCard border border-cyberBorder text-slate-300 hover:text-white">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
       </div>
+    </div>
+
+    <!-- Menu Dropdown Mobile -->
+    <div id="mobile-menu" class="hidden md:hidden bg-cyberCard border-b border-cyberBorder px-6 py-4 space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-cyberBorder">
+        <span class="text-xs text-slate-400">Personagem:</span>
+        <select id="char-selector-mobile" class="bg-cyberBg text-xs font-bold text-cyberCyan outline-none p-1 rounded border border-cyberBorder">
+          <option value="soldado" class="bg-cyberCard text-white" selected>Espiga de Milho</option>
+          <option value="luffy" class="bg-cyberCard text-white">Luffy</option>
+        </select>
+      </div>
+      <a href="#sobre" class="block text-sm font-semibold text-slate-300 hover:text-cyberPurple py-1 mobile-link">Sobre</a>
+      <a href="#trajetoria" class="block text-sm font-semibold text-slate-300 hover:text-cyberPurple py-1 mobile-link">Trajetória</a>
+      <a href="#galeria" class="block text-sm font-semibold text-slate-300 hover:text-cyberPurple py-1 mobile-link">Galeria</a>
+      <a href="#contato" class="block text-sm font-semibold text-slate-300 hover:text-cyberPurple py-1 mobile-link">Contato</a>
     </div>
   </header>
 
-  <!-- HERO SECTION COM LUPA E EFEITO REVELADOR DO QUARTO -->
-  <section class="hero-reveal-container pt-40 pb-20 bg-grid min-h-screen flex items-center relative">
+  <!-- HERO SECTION -->
+  <section class="hero-reveal-container pt-32 sm:pt-40 pb-16 sm:pb-20 bg-grid min-h-[90vh] sm:min-h-screen flex items-center relative">
     
     <!-- Imagem do quarto revelada pela lupa -->
     <div id="revealed-layer"></div>
 
-    <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center relative z-20 w-full">
       
-      <div class="lg:col-span-7 space-y-6 reveal-on-scroll">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyberPurple/10 border border-cyberBorder text-cyberPurple text-xs font-bold uppercase tracking-wider">
+      <div class="lg:col-span-7 space-y-6 reveal-on-scroll text-center lg:text-left">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyberPurple/10 border border-cyberBorder text-cyberPurple text-[11px] sm:text-xs font-bold uppercase tracking-wider">
           <span class="w-2 h-2 rounded-full bg-cyberCyan animate-pulse"></span>
           Product Designer & Full-Stack Developer
         </div>
 
-        <h1 class="text-4xl sm:text-6xl font-black text-white leading-tight">
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-white leading-tight">
           Transformando ideias brutas em <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">experiências digitais</span>.
         </h1>
 
-        <p class="text-slate-400 text-lg max-w-2xl">
+        <p class="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0">
           Desenvolvedor Full-Stack, Product Designer e Ilustrador com sólida experiência em design gráfico, automação de sistemas, IA e cibersegurança.
         </p>
 
-        <div class="flex flex-wrap gap-4 pt-4">
-          <a href="#trajetoria" class="px-8 py-4 rounded-xl bg-cyberPurple text-white font-bold hover:bg-purple-600 transition-all shadow-lg shadow-cyberPurple/25">
+        <div class="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-4 pt-2">
+          <a href="#trajetoria" class="w-full sm:w-auto text-center px-8 py-4 rounded-xl bg-cyberPurple text-white font-bold hover:bg-purple-600 transition-all shadow-lg shadow-cyberPurple/25">
             Ver Linha do Tempo
           </a>
-          <a href="#contato" class="px-8 py-4 rounded-xl bg-cyberCard border border-cyberBorder text-slate-200 font-bold hover:border-cyberPurple transition-all">
+          <a href="#contato" class="w-full sm:w-auto text-center px-8 py-4 rounded-xl bg-cyberCard border border-cyberBorder text-slate-200 font-bold hover:border-cyberPurple transition-all">
             Contato
           </a>
         </div>
       </div>
 
       <div class="lg:col-span-5 flex justify-center reveal-on-scroll">
-        <div class="relative w-72 h-72 sm:w-80 sm:h-80 rounded-3xl bg-cyberCard border border-cyberBorder p-4 shadow-2xl">
+        <div class="relative w-64 h-64 sm:w-80 sm:h-80 rounded-3xl bg-cyberCard border border-cyberBorder p-4 shadow-2xl">
           <div class="w-full h-full rounded-2xl bg-gradient-to-br from-cyberPurple/20 to-cyberCyan/20 flex flex-col items-center justify-center p-6 text-center space-y-4">
             
-            <!-- FOTO DE PERFIL NA LOGO -->
+            <!-- FOTO DE PERFIL -->
             <div class="w-20 h-20 rounded-full border-2 border-cyberPurple overflow-hidden shadow-lg shadow-cyberPurple/30 bg-cyberBg">
               <img src="./eu/carlos_perfil.png" alt="Carlos Henrique Palha" class="w-full h-full object-cover">
             </div>
 
             <div>
-              <h3 class="text-lg font-bold text-white">Carlos Henrique Palha</h3>
+              <h3 class="text-base sm:text-lg font-bold text-white">Carlos Henrique Palha</h3>
               <p class="text-xs text-cyberCyan">Chapecó - SC, Brasil[cite: 1]</p>
             </div>
             <div class="flex flex-wrap justify-center gap-1.5">
@@ -269,20 +298,20 @@
   </section>
 
   <!-- SEÇÃO SOBRE MIM & STACK -->
-  <section id="sobre" class="py-24 bg-cyberCard/30 border-t border-cyberBorder relative z-20">
-    <div class="max-w-7xl mx-auto px-6">
+  <section id="sobre" class="py-20 sm:py-24 bg-cyberCard/30 border-t border-cyberBorder relative z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
       <div class="max-w-3xl space-y-6 reveal-on-scroll">
-        <h2 class="text-3xl font-black text-white">Sobre Mim</h2>
-        <p class="text-slate-300 text-base leading-relaxed">
+        <h2 class="text-2xl sm:text-3xl font-black text-white">Sobre Mim</h2>
+        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
           Atuo como Desenvolvedor Mobile & Web, Product Designer e Artista em Chapecó - SC[cite: 1]. Crio ecossistemas de software robustos focados em soluções escaláveis utilizando Flutter, Python, Firebase e SQLite, além de implementação de fluxos de automação com IA e arquiteturas de cibersegurança de alto porte.
         </p>
-        <p class="text-slate-400 text-base leading-relaxed">
+        <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
           Minha abordagem unifica o rigor técnico do código limpo, conteinerização e bancos de dados eficientes à sensibilidade estética da ilustração digital, interfaces Dark Mode e design de produtos.
         </p>
       </div>
 
-      <!-- GRID COMPLETO DE TECNOLOGIAS E ESPECIALIDADES -->
-      <div id="stack" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
+      <!-- GRID DE TECNOLOGIAS -->
+      <div id="stack" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-10 sm:pt-12">
         <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 reveal-on-scroll">
           <div class="w-10 h-10 rounded-xl bg-cyberPurple/20 border border-cyberPurple flex items-center justify-center text-cyberPurple">
             <i data-lucide="smartphone" class="w-5 h-5"></i>
@@ -316,28 +345,28 @@
     </div>
   </section>
 
-  <!-- SEÇÃO: LINHA DO TEMPO / EXPERIÊNCIA PROFISSIONAL (CYBERPUNK) -->
-  <section id="trajetoria" class="py-24 bg-cyberBg border-t border-cyberBorder relative z-20">
-    <div class="max-w-7xl mx-auto px-6">
+  <!-- SEÇÃO: LINHA DO TEMPO / EXPERIÊNCIA PROFISSIONAL -->
+  <section id="trajetoria" class="py-20 sm:py-24 bg-cyberBg border-t border-cyberBorder relative z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
       <div class="text-center max-w-2xl mx-auto space-y-4 mb-16 reveal-on-scroll">
-        <h2 class="text-3xl sm:text-4xl font-black text-white">Linha do Tempo & <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Experiência</span></h2>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">Linha do Tempo & <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Experiência</span></h2>
         <p class="text-slate-400 text-sm">A evolução prática da minha jornada técnica, criativa e profissional.</p>
       </div>
 
-      <div class="max-w-4xl mx-auto relative border-l-2 border-cyberPurple/30 pl-6 sm:pl-10 space-y-12">
+      <div class="max-w-4xl mx-auto relative border-l-2 border-cyberPurple/30 pl-4 sm:pl-10 space-y-10 sm:space-y-12">
         
         <!-- ITEM 1 -->
         <div class="relative group reveal-on-scroll">
-          <div class="absolute -left-[31px] sm:-left-[47px] top-1 w-5 h-5 rounded-full bg-cyberBg border-2 border-cyberPurple flex items-center justify-center shadow-lg shadow-cyberPurple/50">
-            <div class="w-2 h-2 rounded-full bg-cyberCyan animate-pulse"></div>
+          <div class="absolute -left-[23px] sm:-left-[47px] top-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-cyberBg border-2 border-cyberPurple flex items-center justify-center shadow-lg shadow-cyberPurple/50">
+            <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyberCyan animate-pulse"></div>
           </div>
-          <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-cyberPurple transition-all">
+          <div class="p-5 sm:p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-cyberPurple transition-all">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <span class="text-xs font-bold px-3 py-1 rounded-full bg-cyberPurple/10 text-cyberPurple border border-cyberBorder">Foco Atual</span>
+              <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-cyberPurple/10 text-cyberPurple border border-cyberBorder">Foco Atual</span>
               <span class="text-xs text-slate-400">Desenvolvimento & IA</span>
             </div>
-            <h3 class="text-lg font-bold text-white">Product Designer & Full-Stack Developer</h3>
-            <p class="text-sm text-slate-300 leading-relaxed">
+            <h3 class="text-base sm:text-lg font-bold text-white">Product Designer & Full-Stack Developer</h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Criação e engenharia de soluções digitais avançadas. Desenvolvimento mobile com Flutter, back-ends em Python/FastAPI, conteinerização com Docker e fluxos integrados de Inteligência Artificial e automações locais.
             </p>
           </div>
@@ -345,16 +374,16 @@
 
         <!-- ITEM 2 -->
         <div class="relative group reveal-on-scroll">
-          <div class="absolute -left-[31px] sm:-left-[47px] top-1 w-5 h-5 rounded-full bg-cyberBg border-2 border-cyberCyan flex items-center justify-center">
-            <div class="w-2 h-2 rounded-full bg-cyberPurple"></div>
+          <div class="absolute -left-[23px] sm:-left-[47px] top-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-cyberBg border-2 border-cyberCyan flex items-center justify-center">
+            <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyberPurple"></div>
           </div>
-          <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-cyberCyan transition-all">
+          <div class="p-5 sm:p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-cyberCyan transition-all">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <span class="text-xs font-bold px-3 py-1 rounded-full bg-cyberCyan/10 text-cyberCyan border border-cyberBorder">Trajetória Visual</span>
+              <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-cyberCyan/10 text-cyberCyan border border-cyberBorder">Trajetória Visual</span>
               <span class="text-xs text-slate-400">Artes & Identidade</span>
             </div>
-            <h3 class="text-lg font-bold text-white">Ilustrador & 3 Anos em Design Gráfico</h3>
-            <p class="text-sm text-slate-300 leading-relaxed">
+            <h3 class="text-base sm:text-lg font-bold text-white">Ilustrador & 3 Anos em Design Gráfico</h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Experiência sólida na criação de identidades visuais, branding, ilustrações digitais e conceitos artísticos (como paisagens urbanas e artes estéticas inspiradas na cultura pop e streetwear).
             </p>
           </div>
@@ -362,16 +391,16 @@
 
         <!-- ITEM 3 -->
         <div class="relative group reveal-on-scroll">
-          <div class="absolute -left-[31px] sm:-left-[47px] top-1 w-5 h-5 rounded-full bg-cyberBg border-2 border-purple-500 flex items-center justify-center">
-            <div class="w-2 h-2 rounded-full bg-purple-400"></div>
+          <div class="absolute -left-[23px] sm:-left-[47px] top-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-cyberBg border-2 border-purple-500 flex items-center justify-center">
+            <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-purple-400"></div>
           </div>
-          <div class="p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-purple-500 transition-all">
+          <div class="p-5 sm:p-6 rounded-2xl bg-cyberCard border border-cyberBorder space-y-3 hover:border-purple-500 transition-all">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <span class="text-xs font-bold px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-cyberBorder">Background Versátil</span>
+              <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-cyberBorder">Background Versátil</span>
               <span class="text-xs text-slate-400">Hardware & Automação</span>
             </div>
-            <h3 class="text-lg font-bold text-white">Eletrônica, Manutenção & Automações Industriais</h3>
-            <p class="text-sm text-slate-300 leading-relaxed">
+            <h3 class="text-base sm:text-lg font-bold text-white">Eletrônica, Manutenção & Automações Industriais</h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Bagagem técnica abrangente que vai desde a manutenção de hardware e eletrônica até automações industriais, unindo sistemas físicos e lógicos com precisão operacional.
             </p>
           </div>
@@ -381,19 +410,19 @@
     </div>
   </section>
 
-  <!-- SEÇÃO: GALERIA DE ILUSTRAÇÕES & ARTE DIGITAL (BEHANCE) -->
-  <section id="galeria" class="py-24 bg-cyberCard/30 border-t border-cyberBorder relative z-25">
-    <div class="max-w-7xl mx-auto px-6">
+  <!-- SEÇÃO: GALERIA DE ILUSTRAÇÕES & ARTE DIGITAL (PROPORÇÃO CORRIGIDA) -->
+  <section id="galeria" class="py-20 sm:py-24 bg-cyberCard/30 border-t border-cyberBorder relative z-25">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
       <div class="text-center max-w-2xl mx-auto space-y-4 mb-16 reveal-on-scroll">
-        <h2 class="text-3xl sm:text-4xl font-black text-white">Galeria de <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Ilustrações</span></h2>
-        <p class="text-slate-400 text-sm">Explorando conceitos artísticos e direções visuais criativas. Clique na imagem para expandir em tela cheia[cite: 5].</p>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">Galeria de <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Ilustrações</span></h2>
+        <p class="text-slate-400 text-sm">Explorando conceitos artísticos e direções visuais criativas. Toque na imagem para expandir em tela cheia[cite: 5].</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         
         <!-- ARTE 1 -->
         <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item" data-src="./artes_behance/luff.png" data-title="Luffy Concept" data-desc="Ilustração Digital / Fanart">
-          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+          <div class="h-60 sm:h-64 w-full bg-black/40 flex items-center justify-center p-4">
             <img src="./artes_behance/luff.png" alt="Luffy Artwork" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
           </div>
           <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
@@ -407,7 +436,7 @@
 
         <!-- ARTE 2 -->
         <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item" data-src="./artes_behance/zoro.png" data-title="Zoro Artwork" data-desc="Ilustração / Personagem">
-          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+          <div class="h-60 sm:h-64 w-full bg-black/40 flex items-center justify-center p-4">
             <img src="./artes_behance/zoro.png" alt="Zoro Artwork" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
           </div>
           <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
@@ -421,7 +450,7 @@
 
         <!-- ARTE 3 -->
         <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item" data-src="./artes_behance/fin kake.png" data-title="Fin Kake Style" data-desc="Conceito Artístico">
-          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+          <div class="h-60 sm:h-64 w-full bg-black/40 flex items-center justify-center p-4">
             <img src="./artes_behance/fin kake.png" alt="Fin Kake Artwork" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
           </div>
           <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
@@ -435,7 +464,7 @@
 
         <!-- ARTE 4 -->
         <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item" data-src="./artes_behance/arvore.png" data-title="Estudo Paisagem 01" data-desc="Cenário Impressionista">
-          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+          <div class="h-60 sm:h-64 w-full bg-black/40 flex items-center justify-center p-4">
             <img src="./artes_behance/arvore.png" alt="Paisagem Árvore" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
           </div>
           <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
@@ -449,7 +478,7 @@
 
         <!-- ARTE 5 -->
         <div class="group relative rounded-2xl overflow-hidden bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all shadow-xl cursor-pointer reveal-on-scroll gallery-item sm:col-span-2 lg:col-span-2" data-src="./artes_behance/arvore 2.png" data-title="Estudo Paisagem 02 (Van Gogh Style)" data-desc="Texturas e Atmosfera Visual">
-          <div class="h-64 w-full bg-black/40 flex items-center justify-center p-4">
+          <div class="h-60 sm:h-64 w-full bg-black/40 flex items-center justify-center p-4">
             <img src="./artes_behance/arvore 2.png" alt="Paisagem Árvore 2" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500">
           </div>
           <div class="gallery-info-bar p-4 flex items-center justify-between bg-cyberCard/90 backdrop-blur-sm border-t border-cyberBorder">
@@ -467,24 +496,24 @@
 
   <!-- MODAL / TELA CHEIA DA FOTO (LIGHTBOX) -->
   <div id="image-modal" class="fixed inset-0 z-[100001] bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
-    <button id="modal-close-btn" class="absolute top-6 right-6 p-3 rounded-full bg-cyberCard border border-cyberBorder text-white hover:border-cyberPurple transition-all z-[100002]">
+    <button id="modal-close-btn" class="absolute top-4 right-4 sm:top-6 sm:right-6 p-3 rounded-full bg-cyberCard border border-cyberBorder text-white hover:border-cyberPurple transition-all z-[100002]">
       <i data-lucide="x" class="w-6 h-6"></i>
     </button>
     
     <div class="relative max-w-5xl w-full flex flex-col items-center">
-      <img id="modal-img" src="" alt="" class="max-h-[80vh] w-auto object-contain rounded-2xl border border-cyberBorder shadow-2xl">
-      <div class="mt-4 text-center">
-        <h3 id="modal-title" class="text-xl font-bold text-white"></h3>
+      <img id="modal-img" src="" alt="" class="max-h-[75vh] w-auto object-contain rounded-2xl border border-cyberBorder shadow-2xl">
+      <div class="mt-4 text-center px-4">
+        <h3 id="modal-title" class="text-lg sm:text-xl font-bold text-white"></h3>
         <p id="modal-desc" class="text-xs text-cyberCyan mt-1"></p>
       </div>
     </div>
   </div>
 
   <!-- SEÇÃO DE CONTATO COM API SEGURA -->
-  <section id="contato" class="py-24 bg-cyberBg border-t border-cyberBorder relative z-20">
-    <div class="max-w-7xl mx-auto px-6">
+  <section id="contato" class="py-20 sm:py-24 bg-cyberBg border-t border-cyberBorder relative z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
       <div class="text-center max-w-2xl mx-auto space-y-4 mb-16 reveal-on-scroll">
-        <h2 class="text-3xl sm:text-4xl font-black text-white">Vamos <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Conversar</span>?</h2>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">Vamos <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyberPurple to-cyberCyan">Conversar</span>?</h2>
         <p class="text-slate-400 text-sm">Entre em contato direto pelos canais abaixo ou envie uma mensagem diretamente pelo formulário integrado.</p>
       </div>
 
@@ -492,18 +521,18 @@
         
         <!-- CARDS DE CONTATO DIRETO -->
         <div class="lg:col-span-5 space-y-4 reveal-on-scroll">
-          <a href="mailto:carloshenriquepalhasantos@gmail.com" class="flex items-center gap-4 p-5 rounded-2xl bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all group">
-            <div class="w-12 h-12 rounded-xl bg-cyberPurple/20 border border-cyberPurple flex items-center justify-center text-cyberPurple group-hover:scale-110 transition-transform">
+          <a href="mailto:carloshenriquepalhasantos@gmail.com" class="flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-cyberCard border border-cyberBorder hover:border-cyberPurple transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-cyberPurple/20 border border-cyberPurple flex items-center justify-center text-cyberPurple group-hover:scale-110 transition-transform shrink-0">
               <i data-lucide="mail" class="w-6 h-6"></i>
             </div>
-            <div>
+            <div class="overflow-hidden">
               <span class="text-xs text-slate-400 block font-medium">E-mail Profissional</span>
-              <span class="text-sm font-bold text-white break-all">carloshenriquepalhasantos@gmail.com</span>
+              <span class="text-xs sm:text-sm font-bold text-white break-all">carloshenriquepalhasantos@gmail.com</span>
             </div>
           </a>
 
-          <a href="https://wa.me/5549991710357" target="_blank" class="flex items-center gap-4 p-5 rounded-2xl bg-cyberCard border border-cyberBorder hover:border-cyberCyan transition-all group">
-            <div class="w-12 h-12 rounded-xl bg-cyberCyan/20 border border-cyberCyan flex items-center justify-center text-cyberCyan group-hover:scale-110 transition-transform">
+          <a href="https://wa.me/5549991710357" target="_blank" class="flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-cyberCard border border-cyberBorder hover:border-cyberCyan transition-all group">
+            <div class="w-12 h-12 rounded-xl bg-cyberCyan/20 border border-cyberCyan flex items-center justify-center text-cyberCyan group-hover:scale-110 transition-transform shrink-0">
               <i data-lucide="message-square" class="w-6 h-6"></i>
             </div>
             <div>
@@ -514,7 +543,7 @@
         </div>
 
         <!-- FORMULÁRIO COM CARREGAMENTO DINÂMICO DA CHAVE -->
-        <div class="lg:col-span-7 p-8 rounded-3xl bg-cyberCard border border-cyberBorder space-y-6 reveal-on-scroll">
+        <div class="lg:col-span-7 p-6 sm:p-8 rounded-3xl bg-cyberCard border border-cyberBorder space-y-6 reveal-on-scroll">
           <form action="https://api.web3forms.com/submit" method="POST" class="space-y-4" id="contact-form">
             <!-- A chave é injetada via config.js mantendo o código limpo para o GitHub -->
             <input type="hidden" name="access_key" id="form-access-key" value="">
@@ -559,10 +588,36 @@
       document.getElementById('form-access-key').value = CONFIG.WEB3FORMS_KEY;
     }
 
+    // Controle do Menu Mobile
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+      });
+    });
+
+    // Sincronizar seletores de personagem Desktop e Mobile
+    const charSelector = document.getElementById('char-selector');
+    const charSelectorMobile = document.getElementById('char-selector-mobile');
+
+    if(charSelector && charSelectorMobile) {
+      charSelector.addEventListener('change', (e) => {
+        charSelectorMobile.value = e.target.value;
+      });
+      charSelectorMobile.addEventListener('change', (e) => {
+        charSelector.value = e.target.value;
+      });
+    }
+
     const introOverlay = document.getElementById('intro-overlay');
     const introVideo = document.getElementById('intro-video');
     const shatterContainer = document.getElementById('shatter-container');
-    const charSelector = document.getElementById('char-selector');
 
     let introActive = true; 
 
@@ -582,8 +637,8 @@
       introOverlay.style.display = 'none';
       shatterContainer.style.display = 'block';
 
-      const cols = 12;
-      const rows = 8;
+      const cols = 10;
+      const rows = 6;
       const width = window.innerWidth / cols;
       const height = window.innerHeight / rows;
 
@@ -597,11 +652,11 @@
           shard.style.left = `${c * width}px`;
           shard.style.top = `${r * height}px`;
 
-          const tx = (Math.random() - 0.5) * 800;
-          const ty = Math.random() * 700 + 500;
+          const tx = (Math.random() - 0.5) * 600;
+          const ty = Math.random() * 500 + 400;
           const trot = (Math.random() - 0.5) * 360;
           
-          const duration = Math.random() * 1.5 + 1.5;
+          const duration = Math.random() * 1.2 + 1.2;
 
           shard.style.setProperty('--tx', `${tx}px`);
           shard.style.setProperty('--ty', `${ty}px`);
@@ -616,7 +671,7 @@
         shatterContainer.remove();
         updateCursorStyle(); 
         initScrollReveal(); 
-      }, 3200);
+      }, 2800);
     }
 
     introVideo.addEventListener('ended', triggerGlassShatter);
@@ -629,7 +684,7 @@
       const observerOptions = {
         root: null,
         rootMargin: '0px',
-        threshold: 0.15
+        threshold: 0.1
       };
 
       const observer = new IntersectionObserver((entries, observer) => {
@@ -706,7 +761,7 @@
       });
     });
 
-    // SISTEMA DE CURSOR NATIVO DE MILHO
+    // SISTEMA DE CURSOR NATIVO DE MILHO (Apenas desktop)
     const milhoSprite = new Image();
     milhoSprite.src = './pack_de_sprate/Sprite de Oito Ícones de Milho Direcional.png';
 
@@ -732,16 +787,18 @@
 
     function updateCursorStyle() {
       if (introActive) return;
-      if (charSelector.value === 'soldado' && customCursorUrl) {
+      if (window.innerWidth > 768 && charSelector.value === 'soldado' && customCursorUrl) {
         document.body.style.cursor = `url(${customCursorUrl}) 19 19, auto`;
       } else {
         document.body.style.cursor = 'default';
       }
     }
 
-    charSelector.addEventListener('change', updateCursorStyle);
+    if(charSelector) {
+      charSelector.addEventListener('change', updateCursorStyle);
+    }
 
-    // SISTEMA DE CANVAS (LUPA, PARTÍCULAS E ANIMAÇÃO DO LUFFY)
+    // CANVAS DE PARTÍCULAS E ANIMAÇÃO DO LUFFY
     const canvas = document.getElementById('cyber-canvas');
     const ctx = canvas.getContext('2d');
     const revealedLayer = document.getElementById('revealed-layer');
@@ -772,7 +829,7 @@
         this.x = x;
         this.y = y;
         this.currentFrame = 0;
-        this.frameInterval = 1000 / 12; // 12 FPS
+        this.frameInterval = 1000 / 12;
         this.lastTime = performance.now();
         this.finished = false;
       }
@@ -813,20 +870,20 @@
     window.addEventListener('click', (e) => {
       if (introActive) return; 
 
-      const selectedChar = charSelector.value;
+      const activeChar = charSelector ? charSelector.value : 'soldado';
 
-      if (selectedChar === 'luffy') {
+      if (activeChar === 'luffy') {
         strikes.push(new CharacterStrike(e.clientX, e.clientY));
       }
 
-      for (let i = 0; i < 18; i++) {
+      for (let i = 0; i < 15; i++) {
         const angle = Math.random() * Math.PI * 2;
         particles.push(new CyberParticle(e.clientX, e.clientY, Math.cos(angle) * 3, Math.sin(angle) * 3));
       }
     });
 
     window.addEventListener('mousemove', (e) => {
-      if (introActive) return; 
+      if (introActive || window.innerWidth <= 768) return; 
 
       mouse.prevX = mouse.x;
       mouse.prevY = mouse.y;
@@ -838,12 +895,13 @@
       const dy = mouse.y - mouse.prevY;
       mouse.speed = Math.sqrt(dx * dx + dy * dy);
 
-      const rect = revealedLayer.getBoundingClientRect();
-      const relativeX = e.clientX - rect.left;
-      const relativeY = e.clientY - rect.top;
-
-      revealedLayer.style.setProperty('--mouse-x', `${relativeX}px`);
-      revealedLayer.style.setProperty('--mouse-y', `${relativeY}px`);
+      if (revealedLayer) {
+        const rect = revealedLayer.getBoundingClientRect();
+        const relativeX = e.clientX - rect.left;
+        const relativeY = e.clientY - rect.top;
+        revealedLayer.style.setProperty('--mouse-x', `${relativeX}px`);
+        revealedLayer.style.setProperty('--mouse-y', `${relativeY}px`);
+      }
 
       if (mouse.speed > 2) {
         const spawnAngle = Math.random() * Math.PI * 2;
@@ -865,7 +923,7 @@
       constructor(x, y, dirX, dirY) {
         this.x = x;
         this.y = y;
-        this.size = Math.floor(Math.random() * 6) + 3;
+        this.size = Math.floor(Math.random() * 5) + 3;
         this.color = colors[Math.floor(Math.random() * colors.length)];
         this.vx = dirX * (Math.random() * 3 + 1) + (Math.random() - 0.5);
         this.vy = dirY * (Math.random() * 3 + 1) + (Math.random() - 0.5);
@@ -890,7 +948,7 @@
         ctx.strokeStyle = this.color;
         ctx.fillStyle = this.color;
         ctx.shadowColor = this.color;
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 6;
         
         if (this.isHollow) {
           ctx.lineWidth = 1.5;
@@ -908,7 +966,7 @@
     function animate(now) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (!introActive) {
+      if (!introActive && window.innerWidth > 768) {
         if (mouse.active) {
           globalRotation += 0.02;
           
@@ -934,7 +992,6 @@
             ctx.save();
             ctx.translate(scaleX, scaleY);
             
-            5 + (currentExtension * 0.03);
             const tiltAngle = angle + Math.PI / 2 + (currentExtension * 0.03);
             ctx.rotate(tiltAngle);
 
