@@ -187,10 +187,11 @@
         <a href="#trajetoria" class="hover:text-cyberPurple transition-colors">Trajetória</a>
         <a href="#galeria" class="hover:text-cyberPurple transition-colors">Galeria</a>
         <a href="#contato" class="hover:text-cyberPurple transition-colors">Contato</a>
-        <!-- Ícone da Política de Privacidade -->
-        <a href="#privacidade" class="p-2 rounded-xl bg-cyberCard border border-cyberBorder text-slate-300 hover:text-cyberCyan hover:border-cyberCyan transition-all flex items-center justify-center gap-1.5 text-xs" title="Política de Privacidade">
-          <i data-lucide="shield-text" class="w-4 h-4 text-cyberCyan"></i>
-          <span>Privacidade</span>
+        
+        <!-- Botão "Meus Apps" para a Meta -->
+        <a href="#meus-apps" class="p-2 px-3 rounded-xl bg-cyberCard border border-cyberBorder text-slate-300 hover:text-cyberCyan hover:border-cyberCyan transition-all flex items-center justify-center gap-1.5 text-xs font-bold" title="Documentação Meta Apps">
+          <i data-lucide="layers" class="w-4 h-4 text-cyberCyan"></i>
+          <span>Meus Apps</span>
         </a>
       </nav>
 
@@ -234,9 +235,9 @@
       <a href="#trajetoria" class="block text-sm font-semibold text-slate-300 hover:text-cyberPurple py-1 mobile-link">Trajetória</a>
       <a href="#galeria" class="block text-sm font-semibold text-slate-300 hover:text-cyberPurple py-1 mobile-link">Galeria</a>
       <a href="#contato" class="block text-sm font-semibold text-slate-300 hover:text-cyberPurple py-1 mobile-link">Contato</a>
-      <a href="#privacidade" class="block text-sm font-semibold text-cyberCyan hover:text-white py-1 mobile-link flex items-center gap-2">
-        <i data-lucide="shield-text" class="w-4 h-4"></i>
-        <span>Política de Privacidade</span>
+      <a href="#meus-apps" class="block text-sm font-semibold text-cyberCyan hover:text-white py-1 mobile-link flex items-center gap-2">
+        <i data-lucide="layers" class="w-4 h-4"></i>
+        <span>Meus Apps (Meta)</span>
       </a>
     </div>
   </header>
@@ -548,28 +549,70 @@
     </div>
   </section>
 
-  <!-- SEÇÃO DE POLÍTICA DE PRIVACIDADE -->
-  <section id="privacidade" class="py-16 bg-cyberCard/40 border-t border-cyberBorder relative z-20">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 space-y-6 reveal-on-scroll">
+  <!-- SEÇÃO BLOCO "MEUS APPS" (DOCUMENTAÇÃO META APPS) -->
+  <section id="meus-apps" class="py-16 bg-cyberCard/40 border-t border-cyberBorder relative z-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 reveal-on-scroll">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-cyberCyan/20 border border-cyberCyan flex items-center justify-center text-cyberCyan">
-          <i data-lucide="shield-text" class="w-5 h-5"></i>
+          <i data-lucide="layers" class="w-5 h-5"></i>
         </div>
         <div>
-          <h2 class="text-xl sm:text-2xl font-black text-white">Política de Privacidade</h2>
-          <p class="text-xs text-cyberCyan">Automação Max & Portfólio Digital</p>
+          <h2 class="text-xl sm:text-2xl font-black text-white">Meus Apps</h2>
+          <p class="text-xs text-cyberCyan">Conformidade e Documentação Meta Developers (WhatsApp Cloud API)</p>
         </div>
       </div>
 
-      <div class="p-6 rounded-2xl bg-cyberBg border border-cyberBorder text-slate-300 text-xs sm:text-sm leading-relaxed space-y-3">
-        <p>
-          Este site e as automações associadas respeitam a sua privacidade. As informações fornecidas via formulário de contato ou através da API do WhatsApp (Meta Cloud API) são utilizadas estritamente para comunicação direta e prestação de serviços de atendimento automatizado.
-        </p>
-        <ul class="list-disc pl-5 space-y-1 text-slate-400">
-          <li>Não compartilhamos nem vendemos dados de usuários a terceiros.</li>
-          <li>Mensagens de WhatsApp processadas por nossas IAs são mantidas estritamente em ambiente local e seguro.</li>
-          <li>Você pode solicitar a remoção dos seus dados de contato a qualquer momento.</li>
-        </ul>
+      <!-- GRID COM AS 3 OPÇÕES DE DOCUMENTOS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- OPÇÃO 1: PRIVACIDADE -->
+        <a href="privacy.html" class="p-6 rounded-2xl bg-cyberBg border border-cyberBorder hover:border-cyberCyan transition-all group flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-cyberCyan/10 border border-cyberCyan/30 flex items-center justify-center text-cyberCyan group-hover:scale-110 transition-transform">
+              <i data-lucide="shield-text" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-white text-base group-hover:text-cyberCyan transition-colors">Política de Privacidade</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Diretrizes de proteção e tratamento de dados pessoais coletados via formulários e automações de atendimento.
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-1 text-xs font-bold text-cyberCyan group-hover:translate-x-1 transition-transform">
+            Acessar Documento <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </a>
+
+        <!-- OPÇÃO 2: TERMOS -->
+        <a href="terms.html" class="p-6 rounded-2xl bg-cyberBg border border-cyberBorder hover:border-cyberPurple transition-all group flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-cyberPurple/10 border border-cyberPurple/30 flex items-center justify-center text-cyberPurple group-hover:scale-110 transition-transform">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-white text-base group-hover:text-cyberPurple transition-colors">Termos de Serviço</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Condições gerais de utilização das aplicações, regras de conduta e termos de licença de uso dos ecossistemas.
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-1 text-xs font-bold text-cyberPurple group-hover:translate-x-1 transition-transform">
+            Acessar Documento <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </a>
+
+        <!-- OPÇÃO 3: EXCLUSÃO DE DADOS -->
+        <a href="data-deletion.html" class="p-6 rounded-2xl bg-cyberBg border border-cyberBorder hover:border-red-400/50 transition-all group flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 group-hover:scale-110 transition-transform">
+              <i data-lucide="trash-2" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-white text-base group-hover:text-red-400 transition-colors">Exclusão de Dados</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Instruções detalhadas para remoção e limpeza total de dados mantidos no ambiente local do usuário.
+            </p>
+          </div>
+          <span class="inline-flex items-center gap-1 text-xs font-bold text-red-400 group-hover:translate-x-1 transition-transform">
+            Acessar Documento <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </span>
+        </a>
+
       </div>
     </div>
   </section>
